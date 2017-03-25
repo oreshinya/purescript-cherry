@@ -88,12 +88,14 @@ app (Config { selector, state, view, subscriptions }) = do
 
       patch' prev next target = patch api target prev next
 
+      addHistory historyRef currentState = do
+        modifyRef historyRef (\h -> (view currentState) : h)
+        readRef historyRef
+
       render historyRef = do
         target <- container
         currentState <- select (\s -> s)
-        history <- unsafeRunRef do
-          modifyRef historyRef (\h -> (view currentState) : h)
-          readRef historyRef
+        history <- unsafeRunRef $ addHistory historyRef currentState
         maybe warn (patch' (history !! 1) (history !! 0)) target
 
       draw renderer = do
