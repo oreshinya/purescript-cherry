@@ -104,12 +104,15 @@ app (Config { selector, state, view, subscriptions }) = do
 
 router :: forall e. (String -> Eff (dom :: DOM | e) Unit) ->
           Eff (dom :: DOM | e) Unit
-router matcher = eventWindow >>= addEventListener popstate listener false
-  where
-    path = do
-      l <- window >>= location
-      (<>) <$> pathname l <*> search l
-    listener = eventListener (\_ -> path >>= matcher)
+router matcher = do
+  handler
+  eventWindow >>= addEventListener popstate listener false
+    where
+      path = do
+        l <- window >>= location
+        (<>) <$> pathname l <*> search l
+      handler = path >>= matcher
+      listener = eventListener (\_ -> handler)
 
 
 
