@@ -1,5 +1,23 @@
 {
   "name": "purescript-cherry",
+  "version": "0.1.0",
+  "license": "MIT",
+  "homepage": "https://github.com/oreshinya/purescript-cherry",
+  "authors": [
+    "Shinya Takahashi <s.takahashi313@gmail.com>"
+  ],
+  "description": "purescript simple application framework",
+  "keywords": [
+    "purescript",
+    "spa"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/oreshinya/purescript-cherry.git"
+  },
+  "moduleType": [
+    "node"
+  ],
   "ignore": [
     "**/.*",
     "node_modules",
