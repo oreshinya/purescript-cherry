@@ -9,7 +9,6 @@
   "dependencies": {
     "purescript-prelude": "^2.5.0",
     "purescript-console": "^2.0.0",
-    "purescript-vdom": "^2.0.2",
     "purescript-dom": "^3.7.0",
     "purescript-eff": "^2.0.0",
     "purescript-refs": "^2.0.0",
@@ -17,10 +16,12 @@
     "purescript-nullable": "^2.0.0",
     "purescript-maybe": "^2.1.1",
     "purescript-foldable-traversable": "^2.2.0",
-    "purescript-foreign": "^3.2.0"
+    "purescript-foreign": "^3.2.0",
+    "purescript-vom": "^0.1.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^2.0.0",
-    "purescript-rout": "^1.0.0"
+    "purescript-rout": "^1.0.0",
+    "purescript-tuples": "^3.2.0"
   }
 }

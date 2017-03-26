@@ -2,7 +2,6 @@ module Cherry
   ( BED
   , Config(..)
   , AppEffects
-  , Tree
   , View
   , Subscription
   , app
@@ -25,11 +24,9 @@ import Data.Foreign.Null (writeNull)
 import Data.List (List(..), (!!), (:))
 import Data.Maybe (maybe)
 import Data.Nullable (toMaybe)
-import Data.VirtualDOM (VNode, patch)
-import Data.VirtualDOM.DOM (api)
 import DOM (DOM)
 import DOM.Event.EventTarget (addEventListener, eventListener)
-import DOM.Event.Types (Event, EventType, EventTarget)
+import DOM.Event.Types (EventType, EventTarget)
 import DOM.HTML (window)
 import DOM.HTML.Event.EventTypes (popstate)
 import DOM.HTML.History (DocumentTitle(..), URL(..), pushState, replaceState, forward, back)
@@ -37,16 +34,15 @@ import DOM.HTML.Location (pathname, search)
 import DOM.HTML.Types (Window, HISTORY, windowToEventTarget, htmlDocumentToParentNode)
 import DOM.HTML.Window (document, location, history)
 import DOM.Node.ParentNode (querySelector)
-import DOM.Node.Types (Node, elementToNode)
+import DOM.Node.Types (elementToNode)
+import VOM (VNode, patch)
 
 
 foreign import data BED :: !
 
 type AppEffects e = (console :: CONSOLE, bed :: BED, dom :: DOM, history :: HISTORY | e)
 
-type Tree e = VNode e Node Event
-
-type View e s = s -> Tree e
+type View e s = s -> VNode e
 
 type Subscription e = Eff e Unit
 
@@ -86,8 +82,6 @@ app (Config { selector, state, view, subscriptions }) = do
 
       warn = log $ selector <> "is not found."
 
-      patch' prev next target = patch api target prev next
-
       addHistory historyRef currentState = do
         modifyRef historyRef (\h -> (view currentState) : h)
         readRef historyRef
@@ -96,7 +90,7 @@ app (Config { selector, state, view, subscriptions }) = do
         target <- container
         currentState <- select (\s -> s)
         history <- unsafeRunRef $ addHistory historyRef currentState
-        maybe warn (patch' (history !! 1) (history !! 0)) target
+        maybe warn (patch (history !! 1) (history !! 0)) target
 
       draw renderer = do
         renderer

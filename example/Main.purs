@@ -5,9 +5,10 @@ import Control.Alt ((<|>))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log)
 import Data.Maybe (fromMaybe)
-import Data.VirtualDOM (text, prop, h, with, EventListener(..))
+import Data.Tuple (Tuple(..))
 import Rout (match, lit, int, end)
-import Cherry (Config(..), AppEffects, Tree, Subscription, router, navigateTo, goBack, reduce, app)
+import VOM (VNode, h, t, attr, handler, style)
+import Cherry (Config(..), AppEffects, Subscription, router, navigateTo, goBack, reduce, app)
 
 data Route
   = Home
@@ -45,35 +46,36 @@ increment = do
   log "foo"
 
 -- View
-view :: forall e. State -> Tree (AppEffects e)
+view :: forall e. State -> VNode (AppEffects e)
 view { route: Home } = home
 view { route: Item id, count } = item id count
 view { route: NotFound } = notFound
 
 
-home :: forall e. Tree (AppEffects e)
-home = h "div" (prop [])
-  [ h "h1" (prop []) [ text "Home" ]
-  , with (h "a" (prop []) [ text "Item 1 " ])
-    [ On "click" (\_ -> navigateTo "/items/1") ]
-  , with (h "a" (prop []) [ text "Item 2 " ])
-    [ On "click" (\_ -> navigateTo "/items/2") ]
-  , with (h "a" (prop []) [ text "404" ])
-    [ On "click" (\_ -> navigateTo "/not_found") ]
-  ]
+home :: forall e. VNode (AppEffects e)
+home =
+  h "div" []
+    [ h "h1" [] [ t "Home" ]
+    , h "a" [ Tuple "onClick" $ handler (\_ -> navigateTo "/items/1") ] [ t "Item 1 " ]
+    , h "a" [ Tuple "onClick" $ handler (\_ -> navigateTo "/items/2") ] [ t "Item 2 " ]
+    , h "a" [ Tuple "onClick" $ handler (\_ -> navigateTo "/not_found") ] [ t "404" ]
+    ]
 
-item :: forall e. Int -> Int -> Tree (AppEffects e)
+item :: forall e. Int -> Int -> VNode (AppEffects e)
 item id count =
-  h "div" (prop [])
-  [ h "h1" (prop []) [ text $ "Item " <> show id ]
-  , with (h "div" (prop []) [ text $ show (count :: Int) ])
-    [ On "click" (\_ -> increment) ]
-  , with (h "a" (prop []) [ text "Back" ])
-    [ On "click" (\_ -> goBack) ]
-  ]
+  h "div" []
+    [ h "h1" [] [ t $ "Item " <> show id ]
+    , h "div" [ Tuple "onClick" $ handler (\_ -> increment) ] [ t $ show (count :: Int) ]
+    , h "a" [ Tuple "onClick" $ handler (\_ -> goBack) ] [ t "Back" ]
+    ]
 
-notFound :: forall e. Tree (AppEffects e)
-notFound = h "h1" (prop []) [ text "404" ]
+notFound :: forall e. VNode (AppEffects e)
+notFound =
+  h "div" []
+    [ h "h1" [ Tuple "style" $ style [ Tuple "color" "red" ] ] [ t "404" ]
+    , h "a" [ Tuple "href" $ attr "https://github.com/oreshinya/purescript-cherry" ] [ t "Github" ]
+    ]
+
 
 -- Subscription
 
