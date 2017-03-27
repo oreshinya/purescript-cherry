@@ -1,7 +1,6 @@
 # purescript-cherry
 
 [![Latest release](http://img.shields.io/github/release/oreshinya/purescript-cherry.svg)](https://github.com/oreshinya/purescript-cherry/releases)
-[![Build status](https://travis-ci.org/oreshinya/purescript-cherry.svg?branch=master)](https://travis-ci.org/oreshinya/purescript-cherry)
 
 Simple PureScript application framework.
 
