@@ -1,5 +1,5 @@
 module Cherry
-  ( BED
+  ( CHERRY
   , Config(..)
   , AppEffects
   , View
@@ -38,9 +38,9 @@ import DOM.Node.Types (elementToNode)
 import VOM (VNode, patch)
 
 
-foreign import data BED :: !
+foreign import data CHERRY :: !
 
-type AppEffects e = (console :: CONSOLE, bed :: BED, dom :: DOM, history :: HISTORY | e)
+type AppEffects e = (console :: CONSOLE, cherry :: CHERRY, dom :: DOM, history :: HISTORY | e)
 
 type View e s = s -> VNode e
 
@@ -55,9 +55,9 @@ newtype Config e s = Config
 
 
 
-foreign import select :: forall e s. (s -> s) -> Eff (bed :: BED | e) s
+foreign import select :: forall e s. (s -> s) -> Eff (cherry :: CHERRY | e) s
 
-foreign import reduce :: forall e s. (s -> s) -> Eff (bed :: BED | e) Unit
+foreign import reduce :: forall e s. (s -> s) -> Eff (cherry :: CHERRY | e) Unit
 
 foreign import requestAnimationFrame :: forall e. Eff (dom :: DOM | e) Unit ->
                                         Window ->
