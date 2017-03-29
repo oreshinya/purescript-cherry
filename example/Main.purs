@@ -7,7 +7,7 @@ import Control.Monad.Eff.Console (log)
 import Data.Maybe (fromMaybe)
 import Data.Tuple (Tuple(..))
 import Rout (match, lit, int, end)
-import VOM (VNode, h, t, attr, handler, style)
+import VOM (VNode, h, t, attr, stringTo, noneTo, style)
 import Cherry (Config(..), AppEffects, Subscription, router, navigateTo, goBack, reduce, app)
 
 data Route
@@ -24,49 +24,69 @@ detectRoute url = fromMaybe NotFound $ match url $
 route :: forall e. Subscription (AppEffects e)
 route = router (\url -> reduce (\s -> s { route = detectRoute url }))
 
-
 -- State
 
 type State =
   { route :: Route
   , count :: Int
+  , message :: String
   }
 
 initialState :: State
 initialState =
   { route: Home
   , count: 0
+  , message: ""
   }
+
+-- Reducer
+incr :: State -> State
+incr s = s { count = s.count + 1 }
+
+updateMsg :: String -> State -> State
+updateMsg content s = s { message = content }
 
 -- Action
 
 increment :: forall e. Eff (AppEffects e) Unit
 increment = do
-  reduce (\s -> s { count = s.count + 1 })
+  reduce incr
   log "foo"
+
+changeMessage :: forall e. String -> Eff (AppEffects e) Unit
+changeMessage content = do
+  reduce $ updateMsg content
+  log "bar"
 
 -- View
 view :: forall e. State -> VNode (AppEffects e)
-view { route: Home } = home
+view { route: Home, message } = home message
 view { route: Item id, count } = item id count
 view { route: NotFound } = notFound
 
 
-home :: forall e. VNode (AppEffects e)
-home =
+home :: forall e. String -> VNode (AppEffects e)
+home message =
   h "div" []
     [ h "h1" [] [ t "Home" ]
-    , h "a" [ Tuple "onClick" $ handler (\_ -> navigateTo "/items/1") ] [ t "Item 1 " ]
-    , h "a" [ Tuple "onClick" $ handler (\_ -> navigateTo "/items/2") ] [ t "Item 2 " ]
-    , h "a" [ Tuple "onClick" $ handler (\_ -> navigateTo "/not_found") ] [ t "404" ]
+    , h "div" [] [ t message ]
+    , h "input"
+        [ Tuple "type" $ attr "text"
+        , Tuple "value" $ attr message
+        , Tuple "onInput" $ stringTo changeMessage
+        ]
+        []
+    , h "a" [ Tuple "onClick" $ noneTo $ navigateTo "/items/1" ] [ t "Item 1 " ]
+    , h "a" [ Tuple "onClick" $ noneTo $ navigateTo "/items/2" ] [ t "Item 2 " ]
+    , h "a" [ Tuple "onClick" $ noneTo $ navigateTo "/not_found" ] [ t "404" ]
     ]
 
 item :: forall e. Int -> Int -> VNode (AppEffects e)
 item id count =
   h "div" []
     [ h "h1" [] [ t $ "Item " <> show id ]
-    , h "div" [ Tuple "onClick" $ handler (\_ -> increment) ] [ t $ show (count :: Int) ]
-    , h "a" [ Tuple "onClick" $ handler (\_ -> goBack) ] [ t "Back" ]
+    , h "div" [ Tuple "onClick" $ noneTo increment ] [ t $ show (count :: Int) ]
+    , h "a" [ Tuple "onClick" $ noneTo goBack ] [ t "Back" ]
     ]
 
 notFound :: forall e. VNode (AppEffects e)
