@@ -5,9 +5,9 @@ import Control.Alt ((<|>))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log)
 import Data.Maybe (fromMaybe)
-import Data.Tuple (Tuple(..))
+import Data.Tuple.Nested ((/\))
 import Rout (match, lit, int, end)
-import VOM (VNode, h, t, attr, stringTo, noneTo, style)
+import VOM (VNode, h, t, (:=), (:|), (~>), stringTo, noneTo)
 import Cherry (Config(..), AppEffects, Subscription, router, navigateTo, goBack, reduce, app)
 
 data Route
@@ -40,6 +40,7 @@ initialState =
   }
 
 -- Reducer
+
 incr :: State -> State
 incr s = s { count = s.count + 1 }
 
@@ -59,6 +60,7 @@ changeMessage content = do
   log "bar"
 
 -- View
+
 view :: forall e. State -> VNode (AppEffects e)
 view { route: Home, message } = home message
 view { route: Item id, count } = item id count
@@ -71,29 +73,29 @@ home message =
     [ h "h1" [] [ t "Home" ]
     , h "div" [] [ t message ]
     , h "input"
-        [ Tuple "type" $ attr "text"
-        , Tuple "value" $ attr message
-        , Tuple "onInput" $ stringTo changeMessage
+        [ "type" := "text"
+        , "value" := message
+        , "onInput" ~> stringTo changeMessage
         ]
         []
-    , h "a" [ Tuple "onClick" $ noneTo $ navigateTo "/items/1" ] [ t "Item 1 " ]
-    , h "a" [ Tuple "onClick" $ noneTo $ navigateTo "/items/2" ] [ t "Item 2 " ]
-    , h "a" [ Tuple "onClick" $ noneTo $ navigateTo "/not_found" ] [ t "404" ]
+    , h "a" [ "onClick" ~> (noneTo $ navigateTo "/items/1") ] [ t "Item 1 " ]
+    , h "a" [ "onClick" ~> (noneTo $ navigateTo "/items/2") ] [ t "Item 2 " ]
+    , h "a" [ "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
     ]
 
 item :: forall e. Int -> Int -> VNode (AppEffects e)
 item id count =
   h "div" []
     [ h "h1" [] [ t $ "Item " <> show id ]
-    , h "div" [ Tuple "onClick" $ noneTo increment ] [ t $ show (count :: Int) ]
-    , h "a" [ Tuple "onClick" $ noneTo goBack ] [ t "Back" ]
+    , h "div" [ "onClick" ~> noneTo increment ] [ t $ show (count :: Int) ]
+    , h "a" [ "onClick" ~> noneTo goBack ] [ t "Back" ]
     ]
 
 notFound :: forall e. VNode (AppEffects e)
 notFound =
   h "div" []
-    [ h "h1" [ Tuple "style" $ style [ Tuple "color" "red" ] ] [ t "404" ]
-    , h "a" [ Tuple "href" $ attr "https://github.com/oreshinya/purescript-cherry" ] [ t "Github" ]
+    [ h "h1" [ "style" :| [ "color" /\ "red" ] ] [ t "404" ]
+    , h "a" [ "href" := "https://github.com/oreshinya/purescript-cherry" ] [ t "Github" ]
     ]
 
 
@@ -103,6 +105,7 @@ subscriptions :: forall e. Array (Subscription (AppEffects e))
 subscriptions = [ route ]
 
 -- Init
+
 config :: forall e. Config (AppEffects e) State
 config = Config
   { selector: "#app"
