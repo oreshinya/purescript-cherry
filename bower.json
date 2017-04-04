@@ -40,6 +40,7 @@
   "devDependencies": {
     "purescript-psci-support": "^2.0.0",
     "purescript-rout": "^1.0.0",
-    "purescript-tuples": "^3.2.0"
+    "purescript-tuples": "^3.2.0",
+    "purescript-pure-style": "^0.1.1"
   }
 }

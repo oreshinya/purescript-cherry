@@ -4,11 +4,13 @@ import Prelude
 import Control.Alt ((<|>))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log)
+import Data.Foldable (fold)
 import Data.Maybe (fromMaybe)
 import Data.Tuple.Nested ((/\))
 import Rout (match, lit, int, end)
 import VOM (VNode, h, t, (:=), (:|), (~>), stringTo, noneTo)
 import Cherry (Config(..), AppEffects, Subscription, router, navigateTo, goBack, reduce, app)
+import Style (whole, link)
 
 data Route
   = Home
@@ -62,10 +64,22 @@ changeMessage content = do
 -- View
 
 view :: forall e. State -> VNode (AppEffects e)
-view { route: Home, message } = home message
-view { route: Item id, count } = item id count
-view { route: NotFound } = notFound
+view state =
+  h "div" []
+    [ scene
+    , style
+    ]
+  where
+    scene =
+      case state.route of
+        Home -> home state.message
+        Item id -> item id state.count
+        NotFound -> notFound
 
+style :: forall e. VNode (AppEffects e)
+style = h "style" [] [ t styleStr ]
+  where
+    styleStr = fold [ whole, link.output ]
 
 home :: forall e. String -> VNode (AppEffects e)
 home message =
@@ -78,9 +92,9 @@ home message =
         , "onInput" ~> stringTo changeMessage
         ]
         []
-    , h "a" [ "onClick" ~> (noneTo $ navigateTo "/items/1") ] [ t "Item 1 " ]
-    , h "a" [ "onClick" ~> (noneTo $ navigateTo "/items/2") ] [ t "Item 2 " ]
-    , h "a" [ "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
+    , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/items/1") ] [ t "Item 1 " ]
+    , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/items/2") ] [ t "Item 2 " ]
+    , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
     ]
 
 item :: forall e. Int -> Int -> VNode (AppEffects e)
