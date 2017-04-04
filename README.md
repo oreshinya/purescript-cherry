@@ -2,7 +2,7 @@
 
 [![Latest release](http://img.shields.io/github/release/oreshinya/purescript-cherry.svg)](https://github.com/oreshinya/purescript-cherry/releases)
 
-Simple PureScript application framework.
+Simple PureScript application framework. see [example](https://github.com/oreshinya/purescript-cherry/blob/master/example/Main.purs).
 
 ## Installation
 
