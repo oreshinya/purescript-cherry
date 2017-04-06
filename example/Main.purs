@@ -2,8 +2,10 @@ module Main where
 
 import Prelude
 import Control.Alt ((<|>))
+import Control.Monad.Aff (liftEff', launchAff, later')
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log)
+import Control.Monad.Eff.Exception (EXCEPTION)
 import Data.Foldable (fold)
 import Data.Maybe (fromMaybe)
 import Data.Tuple.Nested ((/\))
@@ -51,10 +53,10 @@ updateMsg content s = s { message = content }
 
 -- Action
 
-increment :: forall e. Eff (AppEffects e) Unit
+increment :: forall e. Eff (AppEffects (err :: EXCEPTION | e)) Unit
 increment = do
-  reduce incr
-  log "foo"
+  launchAff $ later' 1500 $ liftEff' $ reduce incr
+  pure unit
 
 changeMessage :: forall e. String -> Eff (AppEffects e) Unit
 changeMessage content = do
@@ -63,7 +65,7 @@ changeMessage content = do
 
 -- View
 
-view :: forall e. State -> VNode (AppEffects e)
+view :: forall e. State -> VNode (AppEffects (err :: EXCEPTION | e))
 view state =
   h "div" []
     [ scene
@@ -97,7 +99,7 @@ home message =
     , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
     ]
 
-item :: forall e. Int -> Int -> VNode (AppEffects e)
+item :: forall e. Int -> Int -> VNode (AppEffects (err :: EXCEPTION | e))
 item id count =
   h "div" []
     [ h "h1" [] [ t $ "Item " <> show id ]
@@ -120,7 +122,7 @@ subscriptions = [ route ]
 
 -- Init
 
-config :: forall e. Config (AppEffects e) State
+config :: forall e. Config (AppEffects (err :: EXCEPTION | e)) State
 config = Config
   { selector: "#app"
   , state: initialState
@@ -128,5 +130,5 @@ config = Config
   , subscriptions
   }
 
-main :: forall e. Eff (AppEffects e) Unit
+main :: forall e. Eff (AppEffects (err :: EXCEPTION | e)) Unit
 main = app config
