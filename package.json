@@ -6,6 +6,8 @@
     "bower:install": "bower install",
     "pulp:build": "pulp build -o example/output",
     "pulp:bundle": "pulp browserify -I example -o example/output --to example/output/bundle.js",
+    "pulp:version": "pulp version",
+    "pulp:publish": "pulp publish",
     "start": "node server.js"
   },
   "devDependencies": {
