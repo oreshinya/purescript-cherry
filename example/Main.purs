@@ -2,19 +2,20 @@ module Main where
 
 import Prelude
 import Control.Alt ((<|>))
-import Control.Monad.Aff (liftEff', launchAff, later')
+import Control.Monad.Aff (liftEff', launchAff, delay)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log)
 import Control.Monad.Eff.Exception (EXCEPTION)
 import Data.Foldable (fold)
 import Data.Maybe (fromMaybe)
+import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple.Nested ((/\))
 import Rout (match, lit, int, end)
 import VOM (VNode, h, t, (:=), (:|), (~>), stringTo, noneTo)
 import Cherry (Config(..), AppEffects, Subscription, router, navigateTo, goBack, reduce, app)
 import Style (whole, link)
 
-type ExampleEffects e = AppEffects (err :: EXCEPTION | e)
+type ExampleEffects e = AppEffects (exception :: EXCEPTION | e)
 
 data Route
   = Home
@@ -57,7 +58,9 @@ updateMsg content s = s { message = content }
 
 increment :: forall e. Eff (ExampleEffects e) Unit
 increment = do
-  launchAff $ later' 1500 $ liftEff' $ reduce incr
+  _ <- launchAff $ do
+    delay $ Milliseconds 1500.0
+    liftEff' $ reduce incr
   pure unit
 
 changeMessage :: forall e. String -> Eff (ExampleEffects e) Unit
