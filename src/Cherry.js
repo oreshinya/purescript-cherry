@@ -14,22 +14,6 @@ exports.reduce = function(f) {
   }
 }
 
-exports.requestAnimationFrame = function(f) {
-  return function(window_) {
-    if (!requestAnimationFrame) {
-      requestAnimationFrame = (function(){
-        window_.requestAnimationFrame ||
-        window_.webkitRequestAnimationFrame ||
-        window_.mozRequestAnimationFrame ||
-        function(callback) {
-          window_.setTimeout(callback, 1000 / 60)
-        }
-      })();
-    }
-    return function() { requestAnimationFrame(f); }
-  }
-}
-
 exports.dispatchEvent = function(evt) {
   return function(window_) {
     return function() {

@@ -31,7 +31,7 @@ import DOM.HTML.Event.EventTypes (popstate)
 import DOM.HTML.History (DocumentTitle(..), URL(..), pushState, replaceState, forward, back)
 import DOM.HTML.Location (pathname, search)
 import DOM.HTML.Types (Window, HISTORY, windowToEventTarget, htmlDocumentToParentNode)
-import DOM.HTML.Window (document, location, history)
+import DOM.HTML.Window (document, location, history, requestAnimationFrame)
 import DOM.Node.ParentNode (QuerySelector(..), querySelector)
 import DOM.Node.Types (elementToNode)
 import VOM (VNode, patch)
@@ -57,10 +57,6 @@ newtype Config e s = Config
 foreign import select :: forall e s. (s -> s) -> Eff (cherry :: CHERRY | e) s
 
 foreign import reduce :: forall e s. (s -> s) -> Eff (cherry :: CHERRY | e) Unit
-
-foreign import requestAnimationFrame :: forall e. Eff (dom :: DOM | e) Unit ->
-                                        Window ->
-                                        Eff (dom :: DOM | e) Unit
 
 foreign import dispatchEvent :: forall e. EventType ->
                                 Window ->
@@ -93,7 +89,7 @@ app (Config { selector, state, view, subscriptions }) = do
 
       draw renderer = do
         renderer
-        window >>= requestAnimationFrame (draw renderer)
+        void $ window >>= requestAnimationFrame (draw renderer)
 
 
 
