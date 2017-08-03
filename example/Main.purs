@@ -116,7 +116,7 @@ notFound :: forall e. VNode (ExampleEffects e)
 notFound =
   h "div" []
     [ h "h1" [ "style" :| [ "color" /\ "red" ] ] [ t "404" ]
-    , h "a" [ "href" := "https://github.com/oreshinya/purescript-cherry" ] [ t "Github" ]
+    , h "a" [ "href" := "https://github.com/oreshinya/purescript-cherry", "target" := "_blank" ] [ t "Github" ]
     ]
 
 
