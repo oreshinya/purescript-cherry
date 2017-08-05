@@ -33,7 +33,7 @@
     "purescript-maybe": "^3.0.0",
     "purescript-foldable-traversable": "^3.4.0",
     "purescript-foreign": "^4.0.1",
-    "purescript-vom": "^1.1.0"
+    "purescript-vom": "^1.1.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0",
