@@ -2,10 +2,8 @@
 
 var state = {};
 
-exports.select = function(f) {
-  return function() {
-    return f(state);
-  }
+exports.select = function() {
+  return state;
 }
 
 exports.reduce = function(f) {

@@ -54,7 +54,7 @@ newtype Config e s = Config
 
 
 
-foreign import select :: forall e s. (s -> s) -> Eff (cherry :: CHERRY | e) s
+foreign import select :: forall e s. Eff (cherry :: CHERRY | e) s
 
 foreign import reduce :: forall e s. (s -> s) -> Eff (cherry :: CHERRY | e) Unit
 
@@ -83,7 +83,7 @@ app (Config { selector, state, view, subscriptions }) = do
 
       render historyRef = do
         target <- container
-        currentState <- select (\s -> s)
+        currentState <- select
         history <- unsafeRunRef $ addHistory historyRef currentState
         maybe warn (patch (history !! 1) (history !! 0)) target
 
