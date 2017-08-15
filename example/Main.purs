@@ -15,6 +15,7 @@ import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple.Nested ((/\))
 import Rout (match, lit, int, end)
 import VOM (VNode, h, t, (:=), (:|), (~>), stringTo, noneTo)
+import Cherry (mount)
 import Cherry.Store as S
 import Cherry.Renderer as R
 import Cherry.Router (router, navigateTo, goBack)
@@ -24,10 +25,9 @@ import Style (whole, link)
 -- Initialize app
 main :: Eff (dom :: DOM, console :: CONSOLE, ref :: REF, exception :: EXCEPTION, history :: HISTORY) Unit
 main = do
-  route
   renderer <- R.createRenderer "#app" view
-  S.subscribe (R.runRenderer store renderer) store
-  R.runRenderer store renderer
+  mount store renderer [ route ]
+
 
 
 -- Initialize core
