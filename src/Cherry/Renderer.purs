@@ -16,7 +16,7 @@ import DOM.HTML.Types (htmlDocumentToParentNode)
 import DOM.HTML.Window (document, requestAnimationFrame)
 import DOM.Node.ParentNode (QuerySelector(..), querySelector)
 import DOM.Node.Types (Node, elementToNode)
-import Data.List (List(..), (!!), (:))
+import Data.List (List(..), (!!), (:), take)
 import Data.Maybe (Maybe(..))
 import VOM (VNode, patch)
 
@@ -60,6 +60,6 @@ runRenderer store (Renderer r) =
           void $ window >>= requestAnimationFrame do
             writeRef r.renderFlagRef false
             currentState <- select store (\s -> s)
-            modifyRef r.historyRef (\h -> (r.view currentState) : h)
+            modifyRef r.historyRef \h -> take 2 $ r.view currentState : h
             history <- readRef r.historyRef
             patch (history !! 1) (history !! 0) t
