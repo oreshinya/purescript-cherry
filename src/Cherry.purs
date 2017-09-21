@@ -11,11 +11,12 @@ import Data.Foldable (sequence_)
 
 
 
-mount :: forall e s.
-         Store (dom :: DOM, console :: CONSOLE, ref :: REF | e) s ->
-         Renderer (dom :: DOM, console :: CONSOLE, ref :: REF | e) s ->
-         Array (Eff (dom :: DOM, console :: CONSOLE, ref :: REF | e) Unit) ->
-         Eff (dom :: DOM, console :: CONSOLE, ref :: REF | e) Unit
+mount
+  :: forall e s
+   . Store (dom :: DOM, console :: CONSOLE, ref :: REF | e) s
+  -> Renderer (dom :: DOM, console :: CONSOLE, ref :: REF | e) s
+  -> Array (Eff (dom :: DOM, console :: CONSOLE, ref :: REF | e) Unit)
+  -> Eff (dom :: DOM, console :: CONSOLE, ref :: REF | e) Unit
 mount store renderer subscriptions = do
   sequence_ subscriptions
   subscribe (runRenderer store renderer) store

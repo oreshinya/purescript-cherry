@@ -39,33 +39,37 @@ createStore state = unsafePerformEff do
 
 
 
-subscribe :: forall e s.
-             Eff (ref :: REF | e) Unit ->
-             Store (ref :: REF | e) s ->
-             Eff (ref :: REF | e) Unit
+subscribe
+  :: forall e s
+   . Eff (ref :: REF | e) Unit
+  -> Store (ref :: REF | e) s
+  -> Eff (ref :: REF | e) Unit
 subscribe f (Store s) = S.subscribe Emit f s.emitter
 
 
 
-unsubscribe :: forall e s.
-               Store (ref :: REF | e) s ->
-               Eff (ref :: REF | e) Unit
+unsubscribe
+  :: forall e s
+   . Store (ref :: REF | e) s
+  -> Eff (ref :: REF | e) Unit
 unsubscribe (Store s) = S.unsubscribe Emit s.emitter
 
 
 
-select :: forall e s a.
-          Store (ref :: REF | e) s ->
-          (s -> a) ->
-          Eff (ref :: REF | e) a
+select
+  :: forall e s a
+   . Store (ref :: REF | e) s
+  -> (s -> a)
+  -> Eff (ref :: REF | e) a
 select (Store s) f = map f $ readRef s.stateRef
 
 
 
-reduce :: forall e s.
-          Store (ref :: REF | e) s ->
-          (s -> s) ->
-          Eff (ref :: REF | e) Unit
+reduce
+  :: forall e s
+   . Store (ref :: REF | e) s
+  -> (s -> s)
+  -> Eff (ref :: REF | e) Unit
 reduce (Store s) f = do
   modifyRef s.stateRef f
   S.emit Emit s.emitter

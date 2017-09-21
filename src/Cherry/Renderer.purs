@@ -31,10 +31,11 @@ newtype Renderer e s = Renderer
 
 
 
-createRenderer :: forall e s.
-                  String ->
-                  (s -> VNode (dom :: DOM, ref :: REF | e)) ->
-                  Eff (dom :: DOM, ref :: REF | e) (Renderer (dom :: DOM, ref :: REF | e) s)
+createRenderer
+  :: forall e s
+   . String
+  -> (s -> VNode (dom :: DOM, ref :: REF | e))
+  -> Eff (dom :: DOM, ref :: REF | e) (Renderer (dom :: DOM, ref :: REF | e) s)
 createRenderer selector view = do
   doc <- htmlDocumentToParentNode <$> (window >>= document)
   container <- map elementToNode <$> querySelector (QuerySelector selector) doc
@@ -44,10 +45,11 @@ createRenderer selector view = do
 
 
 
-runRenderer :: forall e s.
-               Store (console :: CONSOLE, dom :: DOM, ref :: REF | e) s ->
-               Renderer (console :: CONSOLE, dom :: DOM, ref :: REF | e) s ->
-               Eff (console :: CONSOLE, dom :: DOM, ref :: REF | e) Unit
+runRenderer
+  :: forall e s
+   . Store (console :: CONSOLE, dom :: DOM, ref :: REF | e) s
+  -> Renderer (console :: CONSOLE, dom :: DOM, ref :: REF | e) s
+  -> Eff (console :: CONSOLE, dom :: DOM, ref :: REF | e) Unit
 runRenderer store (Renderer r) =
   case r.container of
     Nothing -> log "Container is not found"

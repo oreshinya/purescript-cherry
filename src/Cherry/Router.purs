@@ -23,9 +23,10 @@ import Data.Maybe (Maybe(..))
 
 
 
-router :: forall e.
-          (String -> Eff (dom :: DOM | e) Unit) ->
-          Eff (dom :: DOM | e) Unit
+router
+  :: forall e
+   . (String -> Eff (dom :: DOM | e) Unit)
+  -> Eff (dom :: DOM | e) Unit
 router matcher = do
   handler
   eventWindow >>= addEventListener popstate listener false
@@ -38,18 +39,20 @@ router matcher = do
 
 
 
-navigateTo :: forall e.
-              String ->
-              Eff (dom :: DOM, history :: HISTORY | e) Unit
+navigateTo
+  :: forall e
+   . String
+  -> Eff (dom :: DOM, history :: HISTORY | e) Unit
 navigateTo url = do
   window >>= history >>= pushState null (DocumentTitle "") (URL url)
   window >>= dispatchEvent popstate
 
 
 
-redirectTo :: forall e.
-              String ->
-              Eff (dom :: DOM, history :: HISTORY | e) Unit
+redirectTo
+  :: forall e
+   . String
+  -> Eff (dom :: DOM, history :: HISTORY | e) Unit
 redirectTo url = do
   window >>= history >>= replaceState null (DocumentTitle "") (URL url)
   window >>= dispatchEvent popstate
@@ -76,7 +79,8 @@ null = toForeign Nothing
 
 
 
-foreign import dispatchEvent :: forall e.
-                                EventType ->
-                                Window ->
-                                Eff (dom :: DOM | e) Unit
+foreign import dispatchEvent
+  :: forall e
+   . EventType
+  -> Window
+  -> Eff (dom :: DOM | e) Unit
