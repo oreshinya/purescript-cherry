@@ -24,16 +24,9 @@
     "output"
   ],
   "dependencies": {
-    "purescript-prelude": "^3.1.0",
+    "purescript-dom": "^4.10.0",
     "purescript-console": "^3.0.0",
-    "purescript-dom": "^4.8.0",
-    "purescript-eff": "^3.1.0",
-    "purescript-refs": "^3.0.0",
-    "purescript-lists": "^4.9.0",
-    "purescript-maybe": "^3.0.0",
-    "purescript-foldable-traversable": "^3.4.0",
-    "purescript-foreign": "^4.0.1",
-    "purescript-vom": "^1.1.2",
+    "purescript-vom": "^1.2.0",
     "purescript-simple-emitter": "^0.1.2"
   },
   "devDependencies": {
