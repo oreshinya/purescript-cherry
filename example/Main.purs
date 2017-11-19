@@ -9,7 +9,6 @@ import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Eff.Ref (REF)
 import DOM (DOM)
 import DOM.HTML.Types (HISTORY)
-import Data.Foldable (fold)
 import Data.Maybe (fromMaybe)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple.Nested ((/\))
@@ -19,7 +18,8 @@ import Cherry (mount)
 import Cherry.Store as S
 import Cherry.Renderer as R
 import Cherry.Router (router, navigateTo, goBack)
-import Style (whole, link)
+import PureStyle (getStyle)
+import Style (sheet, link)
 
 
 -- Initialize app
@@ -87,7 +87,7 @@ view state =
 style :: forall e. VNode e
 style = h "style" [] [ t styleStr ]
   where
-    styleStr = fold [ whole, link.output ]
+    styleStr = getStyle sheet
 
 home :: forall e. String -> VNode (dom :: DOM, console :: CONSOLE, ref :: REF, history :: HISTORY | e)
 home message =
@@ -100,9 +100,9 @@ home message =
         , "onInput" ~> stringTo changeMessage
         ]
         []
-    , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/items/1") ] [ t "Item 1 " ]
-    , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/items/2") ] [ t "Item 2 " ]
-    , h "a" [ "class" := link.name, "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
+    , h "a" [ "class" := link, "onClick" ~> (noneTo $ navigateTo "/items/1") ] [ t "Item 1 " ]
+    , h "a" [ "class" := link, "onClick" ~> (noneTo $ navigateTo "/items/2") ] [ t "Item 2 " ]
+    , h "a" [ "class" := link, "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
     ]
 
 item :: forall e. Int -> Int -> VNode (dom :: DOM, exception :: EXCEPTION, ref :: REF, history :: HISTORY | e)

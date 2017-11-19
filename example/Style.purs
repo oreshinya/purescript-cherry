@@ -1,18 +1,32 @@
 module Style where
 
-import PureStyle (Result, (:), (:-), className, css)
+import Prelude
 
-whole :: String
-whole = css "html, body"
-  [ "height" : "100%"
-  , "background-color" : "yellow"
-  ]
+import PureStyle (StyleSheet, createStyleSheet, registerStyle)
 
-link :: Result
-link = className
-  [ "font-size" : "12px"
-  , "&:hover" :-
-      [ "font-size" : "14px"
-      , "color" : "gray"
-      ]
-  ]
+
+
+sheet :: StyleSheet
+sheet = const sheet' $ registerStyle sheet'
+  """
+  html, body {
+    height: 100%;
+    background-color: yellow;
+  }
+  """
+  where
+    sheet' = createStyleSheet
+
+
+
+link :: String
+link = registerStyle sheet
+  """
+  .& {
+    font-size: 12px;
+  }
+  .&:hover {
+    font-size: 14px;
+    color: gray;
+  }
+  """
