@@ -13,7 +13,7 @@ import Data.Maybe (fromMaybe)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Tuple.Nested ((/\))
 import Rout (match, lit, int, end)
-import VOM (VNode, h, t, (:=), (:|), (~>), stringTo, noneTo)
+import VOM (VNode, h, t, (:=), (~>), stringTo, noneTo)
 import Cherry (mount)
 import Cherry.Store as S
 import Cherry.Renderer as R
@@ -116,7 +116,7 @@ item id count =
 notFound :: forall e. VNode e
 notFound =
   h "div" []
-    [ h "h1" [ "style" :| [ "color" /\ "red" ] ] [ t "404" ]
+    [ h "h1" [ "style" := "color: red;" ] [ t "404" ]
     , h "a" [ "href" := "https://github.com/oreshinya/purescript-cherry", "target" := "_blank" ] [ t "Github" ]
     ]
 
