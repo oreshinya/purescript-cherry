@@ -7,6 +7,7 @@ module Cherry.Renderer
 import Prelude
 
 import Cherry.Store (Store, select)
+import Cherry.VDOM (VNode, patch)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Ref (REF, Ref, modifyRef, newRef, readRef, writeRef)
@@ -18,7 +19,6 @@ import DOM.Node.ParentNode (QuerySelector(..), querySelector)
 import DOM.Node.Types (Node, elementToNode)
 import Data.List (List(..), (!!), (:), take)
 import Data.Maybe (Maybe(..))
-import VOM (VNode, patch)
 
 
 
@@ -64,4 +64,9 @@ runRenderer store (Renderer r) =
             currentState <- select store (\s -> s)
             modifyRef r.historyRef \h -> take 2 $ r.view currentState : h
             history <- readRef r.historyRef
-            patch (history !! 1) (history !! 0) t
+            patch
+              { current: history !! 1
+              , next: history !! 0
+              , parent: t
+              , i: 0
+              }

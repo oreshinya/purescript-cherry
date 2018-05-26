@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 exports.dispatchEvent = function(evt) {
   return function(window_) {

@@ -1,6 +1,14 @@
 module Main where
 
 import Prelude
+
+import Cherry (mount)
+import Cherry.Renderer as R
+import Cherry.Router (router, navigateTo, goBack)
+import Cherry.Router.Parser (match, lit, int, end)
+import Cherry.Store as S
+import Cherry.Style (getStyle)
+import Cherry.VDOM (VNode, h, t, targetValue, (:=), (~>))
 import Control.Alt ((<|>))
 import Control.Monad.Aff (liftEff', launchAff, delay)
 import Control.Monad.Eff (Eff)
@@ -8,16 +16,10 @@ import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Eff.Ref (REF)
 import DOM (DOM)
+import DOM.Event.Event (Event)
 import DOM.HTML.Types (HISTORY)
 import Data.Maybe (fromMaybe)
 import Data.Time.Duration (Milliseconds(..))
-import Rout (match, lit, int, end)
-import VOM (VNode, h, t, (:=), (~>), stringTo, noneTo)
-import Cherry (mount)
-import Cherry.Store as S
-import Cherry.Renderer as R
-import Cherry.Router (router, navigateTo, goBack)
-import PureStyle (getStyle)
 import Style (sheet, link)
 
 
@@ -96,20 +98,20 @@ home message =
     , h "input"
         [ "type" := "text"
         , "value" := message
-        , "onInput" ~> stringTo changeMessage
+        , "onInput" ~> changeMessage
         ]
         []
-    , h "a" [ "class" := link, "onClick" ~> (noneTo $ navigateTo "/items/1") ] [ t "Item 1 " ]
-    , h "a" [ "class" := link, "onClick" ~> (noneTo $ navigateTo "/items/2") ] [ t "Item 2 " ]
-    , h "a" [ "class" := link, "onClick" ~> (noneTo $ navigateTo "/not_found") ] [ t "404 Not Found" ]
+    , h "a" [ "class" := link, "onClick" ~> (const $ navigateTo "/items/1") ] [ t "Item 1 " ]
+    , h "a" [ "class" := link, "onClick" ~> (const $ navigateTo "/items/2") ] [ t "Item 2 " ]
+    , h "a" [ "class" := link, "onClick" ~> (const $ navigateTo "/not_found") ] [ t "404 Not Found" ]
     ]
 
 item :: forall e. Int -> Int -> VNode (dom :: DOM, exception :: EXCEPTION, ref :: REF, history :: HISTORY | e)
 item id count =
   h "div" []
     [ h "h1" [] [ t $ "Item " <> show id ]
-    , h "div" [ "onClick" ~> noneTo increment ] [ t $ show (count :: Int) ]
-    , h "a" [ "onClick" ~> noneTo goBack ] [ t "Back" ]
+    , h "div" [ "onClick" ~> const increment ] [ t $ show (count :: Int) ]
+    , h "a" [ "onClick" ~> const goBack ] [ t "Back" ]
     ]
 
 notFound :: forall e. VNode e
@@ -132,8 +134,9 @@ increment = do
 
 
 
-changeMessage :: forall e. String -> Eff (console :: CONSOLE, ref :: REF | e) Unit
-changeMessage content = do
+changeMessage :: forall e. Event -> Eff (console :: CONSOLE, dom :: DOM, ref :: REF | e) Unit
+changeMessage ev = do
+  content <- targetValue ev
   reduce $ updateMsg content
   cnt <- select _.count
   reduce \s -> s { count = cnt + 1 }

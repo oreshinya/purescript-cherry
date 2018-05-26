@@ -4,10 +4,12 @@ module Cherry.Router
   , redirectTo
   , goForward
   , goBack
+  , module Exports
   ) where
 
 import Prelude
 
+import Cherry.Router.Parser as Exports
 import Control.Monad.Eff (Eff)
 import DOM (DOM)
 import DOM.Event.EventTarget (addEventListener, eventListener)

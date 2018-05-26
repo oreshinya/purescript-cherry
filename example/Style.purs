@@ -2,7 +2,7 @@ module Style where
 
 import Prelude
 
-import PureStyle (StyleSheet, createStyleSheet, registerStyle)
+import Cherry.Style (StyleSheet, createStyleSheet, registerStyle)
 
 
 
