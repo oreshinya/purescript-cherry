@@ -4,47 +4,42 @@ module Cherry.Router
   , redirectTo
   , goForward
   , goBack
-  , module Exports
   ) where
 
 import Prelude
 
-import Cherry.Router.Parser as Exports
-import Control.Monad.Eff (Eff)
-import DOM (DOM)
-import DOM.Event.EventTarget (addEventListener, eventListener)
-import DOM.Event.Types (EventTarget, EventType)
-import DOM.HTML (window)
-import DOM.HTML.Event.EventTypes (popstate)
-import DOM.HTML.History (DocumentTitle(..), URL(..), back, forward, pushState, replaceState)
-import DOM.HTML.Location (pathname, search)
-import DOM.HTML.Types (HISTORY, Window, windowToEventTarget)
-import DOM.HTML.Window (history, location)
-import Data.Foreign (Foreign, toForeign)
+import Effect (Effect)
+import Web.Event.Event (EventType)
+import Web.Event.EventTarget (addEventListener, eventListener)
+import Web.Event.Internal.Types (EventTarget)
+import Web.HTML (window)
+import Web.HTML.Event.PopStateEvent.EventTypes (popstate)
+import Web.HTML.History (DocumentTitle(..), URL(..), back, forward, pushState, replaceState)
+import Web.HTML.Location (pathname, search)
+import Web.HTML.Window (Window, toEventTarget, history, location)
+import Foreign (Foreign, unsafeToForeign)
 import Data.Maybe (Maybe(..))
 
 
 
 router
-  :: forall e
-   . (String -> Eff (dom :: DOM | e) Unit)
-  -> Eff (dom :: DOM | e) Unit
+  :: (String -> Effect Unit)
+  -> Effect Unit
 router matcher = do
   handler
+  listener <- eventListener (\_ -> handler)
   eventWindow >>= addEventListener popstate listener false
     where
       handler = do
         l <- window >>= location
         path <- (<>) <$> pathname l <*> search l
         matcher path
-      listener = eventListener (\_ -> handler)
 
 
 
 navigateTo
-  :: forall e
-   . String
-  -> Eff (dom :: DOM, history :: HISTORY | e) Unit
+  :: String
+  -> Effect Unit
 navigateTo url = do
   window >>= history >>= pushState null (DocumentTitle "") (URL url)
   window >>= dispatchEvent popstate
@@ -52,37 +47,35 @@ navigateTo url = do
 
 
 redirectTo
-  :: forall e
-   . String
-  -> Eff (dom :: DOM, history :: HISTORY | e) Unit
+  :: String
+  -> Effect Unit
 redirectTo url = do
   window >>= history >>= replaceState null (DocumentTitle "") (URL url)
   window >>= dispatchEvent popstate
 
 
 
-goForward :: forall e. Eff (dom :: DOM, history :: HISTORY | e) Unit
+goForward ::Effect Unit
 goForward = window >>= history >>= forward
 
 
 
-goBack :: forall e. Eff (dom :: DOM, history :: HISTORY | e) Unit
+goBack :: Effect Unit
 goBack = window >>= history >>= back
 
 
 
-eventWindow :: forall e. Eff (dom :: DOM | e) EventTarget
-eventWindow = windowToEventTarget <$> window
+eventWindow :: Effect EventTarget
+eventWindow = toEventTarget <$> window
 
 
 
 null :: Foreign
-null = toForeign Nothing
+null = unsafeToForeign Nothing
 
 
 
 foreign import dispatchEvent
-  :: forall e
-   . EventType
+  :: EventType
   -> Window
-  -> Eff (dom :: DOM | e) Unit
+  -> Effect Unit

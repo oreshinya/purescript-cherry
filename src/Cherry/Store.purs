@@ -9,9 +9,9 @@ module Cherry.Store
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Ref (REF, Ref, modifyRef, newRef, readRef)
-import Control.Monad.Eff.Unsafe (unsafePerformEff)
+import Effect (Effect)
+import Effect.Ref (Ref, modify_, new, read)
+import Effect.Unsafe (unsafePerformEffect)
 import SimpleEmitter as S
 
 
@@ -24,52 +24,52 @@ derive instance ordEvent :: Ord Event
 
 
 
-newtype Store e s = Store
-  { emitter :: S.Emitter e Event
+newtype Store s = Store
+  { emitter :: S.Emitter Event
   , stateRef :: Ref s
   }
 
 
 
-createStore :: forall e s. s -> Store (ref :: REF | e) s
-createStore state = unsafePerformEff do
+createStore :: forall s. s -> Store s
+createStore state = unsafePerformEffect do
   emitter <- S.createEmitter
-  stateRef <- newRef state
+  stateRef <- new state
   pure $ Store { emitter, stateRef }
 
 
 
 subscribe
-  :: forall e s
-   . Eff (ref :: REF | e) Unit
-  -> Store (ref :: REF | e) s
-  -> Eff (ref :: REF | e) Unit
+  :: forall s
+   . Effect Unit
+  -> Store s
+  -> Effect Unit
 subscribe f (Store s) = S.subscribe Emit f s.emitter
 
 
 
 unsubscribe
-  :: forall e s
-   . Store (ref :: REF | e) s
-  -> Eff (ref :: REF | e) Unit
+  :: forall s
+   . Store s
+  -> Effect Unit
 unsubscribe (Store s) = S.unsubscribe Emit s.emitter
 
 
 
 select
-  :: forall e s a
-   . Store (ref :: REF | e) s
+  :: forall s a
+   . Store s
   -> (s -> a)
-  -> Eff (ref :: REF | e) a
-select (Store s) f = map f $ readRef s.stateRef
+  -> Effect a
+select (Store s) f = map f $ read s.stateRef
 
 
 
 reduce
-  :: forall e s
-   . Store (ref :: REF | e) s
+  :: forall s
+   . Store s
   -> (s -> s)
-  -> Eff (ref :: REF | e) Unit
+  -> Effect Unit
 reduce (Store s) f = do
-  modifyRef s.stateRef f
+  modify_ f s.stateRef
   S.emit Emit s.emitter

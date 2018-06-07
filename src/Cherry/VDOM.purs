@@ -12,63 +12,62 @@ module Cherry.VDOM
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
+import Effect (Effect)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-import Control.Safely as Safe
-import DOM (DOM)
-import DOM.Event.Event (target)
-import DOM.Event.EventTarget (eventListener)
-import DOM.Event.Types (Event)
-import DOM.HTML (window)
-import DOM.HTML.HTMLInputElement (value)
-import DOM.HTML.Types (htmlDocumentToDocument)
-import DOM.HTML.Window (document)
-import DOM.Node.Document (createTextNode, createElement, createElementNS)
-import DOM.Node.Element (removeAttribute, setAttribute)
-import DOM.Node.Node (appendChild, childNodes, insertBefore, removeChild, replaceChild)
-import DOM.Node.NodeList (item)
-import DOM.Node.Types (Document, Element, Node, elementToNode, textToNode)
+import Web.Event.Event (target)
+import Web.Event.EventTarget (eventListener)
+import Web.Event.Internal.Types (Event)
+import Web.HTML (window)
+import Web.HTML.HTMLInputElement (value)
+import Web.HTML.HTMLDocument (toDocument)
+import Web.HTML.Window (document)
+import Web.DOM.Document (Document, createTextNode, createElement, createElementNS)
+import Web.DOM.Element (Element, removeAttribute, setAttribute)
+import Web.DOM.Element as E
+import Web.DOM.Node (Node, appendChild, childNodes, insertBefore, removeChild, replaceChild)
+import Web.DOM.NodeList (item)
+import Web.DOM.Text as T
 import Data.Array (union, length, (!!))
-import Data.Foldable (foldMap)
-import Data.Foreign (Foreign, toForeign)
+import Data.Foldable (for_, foldMap)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..), fst, lookup, curry)
 import Unsafe.Coerce (unsafeCoerce)
+import Foreign (Foreign, unsafeToForeign)
 
 
 
-data VProp e
+data VProp
   = Attribute String
-  | Handler (Event -> Eff e Unit)
+  | Handler (Event -> Effect Unit)
 
 
 
-data VInfo e
+data VInfo
   = Element
     { tag :: String
-    , props :: Array (Tuple String (VProp e))
-    , children :: Array (VNode e)
+    , props :: Array (Tuple String VProp)
+    , children :: Array VNode
     }
   | Text String
 
 
-data VNode e = VNode String (VInfo e)
+data VNode = VNode String VInfo
 
 
 
-foreign import setForeign :: forall e. String -> Foreign -> Element -> Eff (dom :: DOM | e) Unit
+foreign import setForeign :: String -> Foreign -> Element -> Effect Unit
 
-foreign import removeForeign :: forall e. String -> Element -> Eff (dom :: DOM | e) Unit
+foreign import removeForeign :: String -> Element -> Effect Unit
 
 
 
-vPropToKey :: forall e. VProp e -> String
+vPropToKey :: VProp -> String
 vPropToKey (Attribute x) = "attribute(" <> x <> ")"
 vPropToKey (Handler x) = "handler()"
 
 
 
-vInfoToKey :: forall e. VInfo e -> String
+vInfoToKey :: VInfo -> String
 vInfoToKey (Text x) = "text(" <> x <> ")"
 vInfoToKey (Element { tag, props, children }) =
   "element(" <> tagKey <> propsKey <> childrenKey <> ")"
@@ -85,11 +84,10 @@ vInfoToKey (Element { tag, props, children }) =
 
 
 
-h :: forall e
-   . String
-  -> Array (Tuple String (VProp e))
-  -> Array (VNode e)
-  -> VNode e
+h :: String
+  -> Array (Tuple String VProp)
+  -> Array VNode
+  -> VNode
 h tag props children = VNode key el
   where
     el = Element { tag, props, children }
@@ -97,7 +95,7 @@ h tag props children = VNode key el
 
 
 
-t :: forall e. String -> VNode e
+t :: String -> VNode
 t x = VNode key txt
   where
     txt = Text x
@@ -105,22 +103,22 @@ t x = VNode key txt
 
 
 
-attribute :: forall e. String -> String -> Tuple String (VProp e)
+attribute :: String -> String -> Tuple String VProp
 attribute key value' = Tuple key (Attribute value')
 
 infixr 1 attribute as :=
 
 
 
-handler :: forall e. String -> (Event -> Eff e Unit) -> Tuple String (VProp e)
+handler :: String -> (Event -> Effect Unit) -> Tuple String VProp
 handler key fn = Tuple key (Handler fn)
 
 infixr 1 handler as ~>
 
 
 
-doc :: forall e. Eff (dom :: DOM | e) Document
-doc = window >>= document >>= htmlDocumentToDocument >>> pure
+doc :: Effect Document
+doc = window >>= document >>= toDocument >>> pure
 
 
 
@@ -130,33 +128,31 @@ svgNameSpace = Just "http://www.w3.org/2000/svg"
 
 
 setProp
-  :: forall e
-   . Element
-  -> Tuple String (VProp (dom :: DOM | e))
-  -> Eff (dom :: DOM | e) Unit
+  :: Element
+  -> Tuple String VProp
+  -> Effect Unit
 setProp el (Tuple k v) =
   case v of
     Attribute val -> do
-      setForeign k (toForeign val) el
+      setForeign k (unsafeToForeign val) el
       setAttribute k val el
     Handler val ->
-      setForeign k (toForeign $ eventListener val) el
+      setForeign k (unsafeToForeign $ eventListener val) el
 
 
 
 removeProp
-  :: forall e
-   . { el :: Element, key :: String }
-  -> Eff (dom :: DOM | e) Unit
+  :: { el :: Element, key :: String }
+  -> Effect Unit
 removeProp { el, key } = do
   removeForeign key el
   removeAttribute key el
 
 
 
-createNode :: forall e. VInfo (dom :: DOM | e) -> Eff (dom :: DOM | e) Node
+createNode :: VInfo -> Effect Node
 createNode (Text text) =
-  doc >>= createTextNode text >>= textToNode >>> pure
+  doc >>= createTextNode text >>= T.toNode >>> pure
 
 createNode (Element { tag, props, children }) = do
   el <- case tag of
@@ -164,9 +160,9 @@ createNode (Element { tag, props, children }) = do
       doc >>= createElementNS svgNameSpace tag
     _ ->
       doc >>= createElement tag
-  Safe.for_ props $ setProp el
-  let node = elementToNode el
-  Safe.for_ children
+  for_ props $ setProp el
+  let node = E.toNode el
+  for_ children
     \(VNode _ vc) -> do
       child <- createNode vc
       void $ appendChild child node
@@ -175,14 +171,13 @@ createNode (Element { tag, props, children }) = do
 
 
 updateProps
-  :: forall e
-   . { currentProps :: Array (Tuple String (VProp (dom :: DOM | e)))
-     , nextProps :: Array (Tuple String (VProp (dom :: DOM | e)))
+  :: { currentProps :: Array (Tuple String VProp)
+     , nextProps :: Array (Tuple String VProp)
      , el :: Element
      }
-  -> Eff (dom :: DOM | e) Unit
+  -> Effect Unit
 updateProps { currentProps, nextProps, el } =
-  Safe.for_ keys update
+  for_ keys update
   where
     keys = union (map fst currentProps) (map fst nextProps)
     update key =
@@ -195,9 +190,8 @@ updateProps { currentProps, nextProps, el } =
 
 
 changed
-  :: forall e
-   . { currentInfo :: VInfo e
-     , nextInfo :: VInfo e
+  :: { currentInfo :: VInfo
+     , nextInfo :: VInfo
      }
    -> Boolean
 changed { currentInfo: Element current, nextInfo: Element next } = current.tag /= next.tag
@@ -206,19 +200,18 @@ changed _ = true
 
 
 
-targetValue :: forall e. Event -> Eff (dom :: DOM | e) String
+targetValue :: Event -> Effect String
 targetValue = target >>> unsafeCoerce >>> value
 
 
 
 patch
-  :: forall e
-   . { current :: Maybe (VNode (dom :: DOM | e))
-     , next :: Maybe (VNode (dom :: DOM | e))
+  :: { current :: Maybe VNode
+     , next :: Maybe VNode
      , parent :: Node
      , i :: Int
      }
-  -> Eff (dom :: DOM | e) Unit
+  -> Effect Unit
 patch { current: Nothing, next: Nothing } = pure unit
 patch { current: Nothing, next: Just (VNode _ next), parent, i } = do
   newNode <- createNode next

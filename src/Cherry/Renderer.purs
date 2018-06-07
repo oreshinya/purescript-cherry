@@ -8,62 +8,62 @@ import Prelude
 
 import Cherry.Store (Store, select)
 import Cherry.VDOM (VNode, patch)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.Ref (REF, Ref, modifyRef, newRef, readRef, writeRef)
-import DOM (DOM)
-import DOM.HTML (window)
-import DOM.HTML.Types (htmlDocumentToParentNode)
-import DOM.HTML.Window (document, requestAnimationFrame)
-import DOM.Node.ParentNode (QuerySelector(..), querySelector)
-import DOM.Node.Types (Node, elementToNode)
+import Effect (Effect)
+import Effect.Console (log)
+import Effect.Ref (Ref, modify_, new, read, write)
+import Web.HTML (window)
+import Web.HTML.HTMLDocument (toParentNode)
+import Web.HTML.Window (document, requestAnimationFrame)
+import Web.DOM.ParentNode (QuerySelector(..), querySelector)
+import Web.DOM.Internal.Types (Node)
+import Web.DOM.Element (toNode)
 import Data.List (List(..), (!!), (:), take)
 import Data.Maybe (Maybe(..))
 
 
 
-newtype Renderer e s = Renderer
+newtype Renderer s = Renderer
   { container :: Maybe Node
-  , view :: s -> VNode e
-  , historyRef :: Ref (List (VNode e))
+  , view :: s -> VNode
+  , historyRef :: Ref (List VNode)
   , renderFlagRef :: Ref Boolean
   }
 
 
 
 createRenderer
-  :: forall e s
+  :: forall s
    . String
-  -> (s -> VNode (dom :: DOM, ref :: REF | e))
-  -> Eff (dom :: DOM, ref :: REF | e) (Renderer (dom :: DOM, ref :: REF | e) s)
+  -> (s -> VNode)
+  -> Effect (Renderer s)
 createRenderer selector view = do
-  doc <- htmlDocumentToParentNode <$> (window >>= document)
-  container <- map elementToNode <$> querySelector (QuerySelector selector) doc
-  historyRef <- newRef Nil
-  renderFlagRef <- newRef false
+  doc <- toParentNode <$> (window >>= document)
+  container <- map toNode <$> querySelector (QuerySelector selector) doc
+  historyRef <- new Nil
+  renderFlagRef <- new false
   pure $ Renderer { container, view, historyRef, renderFlagRef }
 
 
 
 runRenderer
-  :: forall e s
-   . Store (console :: CONSOLE, dom :: DOM, ref :: REF | e) s
-  -> Renderer (console :: CONSOLE, dom :: DOM, ref :: REF | e) s
-  -> Eff (console :: CONSOLE, dom :: DOM, ref :: REF | e) Unit
+  :: forall s
+   . Store s
+  -> Renderer s
+  -> Effect Unit
 runRenderer store (Renderer r) =
   case r.container of
     Nothing -> log "Container is not found"
     Just t -> do
-      renderFlag <- readRef r.renderFlagRef
+      renderFlag <- read r.renderFlagRef
       if renderFlag
         then pure unit
         else do
-          writeRef r.renderFlagRef true
+          write true r.renderFlagRef
           void $ window >>= requestAnimationFrame do
-            writeRef r.renderFlagRef false
+            write false r.renderFlagRef
             currentState <- select store (\s -> s)
-            modifyRef r.historyRef \h -> take 2 $ r.view currentState : h
-            history <- readRef r.historyRef
+            flip modify_ r.historyRef \h -> take 2 $ r.view currentState : h
+            history <- read r.historyRef
             patch
               { current: history !! 1
               , next: history !! 0

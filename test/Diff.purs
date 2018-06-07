@@ -3,30 +3,29 @@ module Test.Diff (assertDiffAlgorithm) where
 import Prelude
 
 import Cherry.VDOM (h, patch, t)
-import Control.Monad.Eff (Eff)
-import DOM (DOM)
-import DOM.HTML (window)
-import DOM.HTML.Document (body)
-import DOM.HTML.Types (htmlElementToNode)
-import DOM.HTML.Window (document)
-import DOM.Node.Node (childNodes, firstChild, textContent)
-import DOM.Node.NodeList (item)
+import Effect (Effect)
+import Web.HTML (window)
+import Web.HTML.HTMLDocument (body)
+import Web.HTML.HTMLElement (toNode)
+import Web.HTML.Window (document)
+import Web.DOM.Node (childNodes, firstChild, textContent)
+import Web.DOM.NodeList (item)
 import Data.Array (length, range, (!!))
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
-import Test.Assert (ASSERT, assert)
+import Test.Assert (assert)
 import Test.TestHelper (clearBody)
 
 
 
-assertDiffAlgorithm :: forall e. Eff (dom :: DOM, assert :: ASSERT | e) Unit
+assertDiffAlgorithm :: Effect Unit
 assertDiffAlgorithm = do
   assertDiffAlgorithmForText
   assertDiffAlgorithmForElement
 
 
 
-assertDiffAlgorithmForText :: forall e. Eff (dom :: DOM, assert :: ASSERT | e) Unit
+assertDiffAlgorithmForText :: Effect Unit
 assertDiffAlgorithmForText =
   for_ afterCases assertDiff
   where
@@ -41,17 +40,17 @@ assertDiffAlgorithmForText =
           patch
             { current: Nothing
             , next: Just $ root beforeCase
-            , parent: htmlElementToNode body'
+            , parent: toNode body'
             , i: 0
             }
-          (firstChild $ htmlElementToNode body') >>= assertText beforeCase
+          (firstChild $ toNode body') >>= assertText beforeCase
           patch
             { current: Just $ root beforeCase
             , next: Just $ root testCase
-            , parent: htmlElementToNode body'
+            , parent: toNode body'
             , i: 0
             }
-          (firstChild $ htmlElementToNode body') >>= assertText testCase
+          (firstChild $ toNode body') >>= assertText testCase
 
     assertText _ Nothing = assert false
     assertText testCase (Just parent) =
@@ -68,7 +67,7 @@ assertDiffAlgorithmForText =
 
 
 
-assertDiffAlgorithmForElement :: forall e. Eff (dom :: DOM, assert :: ASSERT | e) Unit
+assertDiffAlgorithmForElement :: Effect Unit
 assertDiffAlgorithmForElement =
   for_ afterCases assertDiff
   where
@@ -83,17 +82,17 @@ assertDiffAlgorithmForElement =
           patch
             { current: Nothing
             , next: Just $ root beforeCase
-            , parent: htmlElementToNode body'
+            , parent: toNode body'
             , i: 0
             }
-          (firstChild $ htmlElementToNode body') >>= assertElement beforeCase
+          (firstChild $ toNode body') >>= assertElement beforeCase
           patch
             { current: Just $ root beforeCase
             , next: Just $ root testCase
-            , parent: htmlElementToNode body'
+            , parent: toNode body'
             , i: 0
             }
-          (firstChild $ htmlElementToNode body') >>= assertElement testCase
+          (firstChild $ toNode body') >>= assertElement testCase
 
     assertElement _ Nothing = assert false
     assertElement testCase (Just parent) =

@@ -23,7 +23,7 @@ import Data.Foldable (foldr)
 import Data.Int (fromString)
 import Data.List (catMaybes, List(Nil, Cons), fromFoldable, drop)
 import Data.Maybe (Maybe(Just, Nothing), maybe)
-import Data.Profunctor (lmap)
+import Data.Profunctor (lcmap)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Global (readFloat, isNaN)
 
@@ -158,7 +158,7 @@ routeFromUrl url =
 
 parsePath :: Route -> String -> Route
 parsePath query = drop 1 <<< foldr prependPath query <<< S.split (S.Pattern "/")
-  where prependPath = lmap Path Cons
+  where prependPath = lcmap Path Cons
 
 
 
