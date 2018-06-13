@@ -1,4 +1,4 @@
-module Test.Style (testStyle) where
+module Test.Style (assertStyle) where
 
 import Prelude
 
@@ -9,8 +9,8 @@ import Test.Assert (assert)
 
 
 
-testStyle :: Effect Unit
-testStyle = do
+assertStyle :: Effect Unit
+assertStyle = do
   assert $ sampleClass == "pz66dqm"
   assert $ sampleKeyframes == "p25sc03"
   assert $ sampleClassNameWithMedia == "p2aok7f"

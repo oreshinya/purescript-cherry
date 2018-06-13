@@ -1,4 +1,4 @@
-module Test.Router.Parser (testRouteParser) where
+module Test.Router.Parser (assertRouteParser) where
 
 import Prelude
 
@@ -24,8 +24,8 @@ route url = fromMaybe NotFound $ match url $
   <|>
   User <$> (lit "users" *> int) <* end
 
-testRouteParser :: Effect Unit
-testRouteParser = do
+assertRouteParser :: Effect Unit
+assertRouteParser = do
   assert $ route "" == Home
   assert $ route "/" == Home
   assert $ route "/users?name=oreshinya" == Users "oreshinya"
