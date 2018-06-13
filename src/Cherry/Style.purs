@@ -7,14 +7,14 @@ module Cherry.Style
 
 import Prelude
 
-import Effect.Ref (Ref, modify_, new, read)
-import Effect.Unsafe (unsafePerformEffect)
 import Data.Char (toCharCode)
 import Data.Foldable (foldr)
 import Data.Int (base36, toStringAs)
 import Data.Int.Bits (xor, zshr)
 import Data.String (Pattern(..), Replacement(..), replaceAll)
 import Data.String.CodeUnits (toCharArray)
+import Effect.Ref (Ref, modify_, new, read)
+import Effect.Unsafe (unsafePerformEffect)
 
 
 

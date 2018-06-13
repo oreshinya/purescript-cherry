@@ -2,9 +2,9 @@ module Test.Style (assertStyle) where
 
 import Prelude
 
+import Cherry.Style (StyleSheet, createStyleSheet, getStyle, registerStyle)
 import Effect (Effect)
 import Effect.Console (log)
-import Cherry.Style (StyleSheet, createStyleSheet, getStyle, registerStyle)
 import Test.Assert (assert)
 
 

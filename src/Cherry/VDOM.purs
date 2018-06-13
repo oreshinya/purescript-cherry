@@ -12,27 +12,27 @@ module Cherry.VDOM
 
 import Prelude
 
-import Effect (Effect)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-import Web.Event.Event (target)
-import Web.Event.EventTarget (eventListener)
-import Web.Event.Internal.Types (Event)
-import Web.HTML (window)
-import Web.HTML.HTMLInputElement (value)
-import Web.HTML.HTMLDocument (toDocument)
-import Web.HTML.Window (document)
+import Data.Array (union, length, (!!))
+import Data.Foldable (for_, foldMap)
+import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..), curry, fst, lookup)
+import Effect (Effect)
+import Foreign (Foreign, unsafeToForeign)
+import Unsafe.Coerce (unsafeCoerce)
 import Web.DOM.Document (Document, createTextNode, createElement, createElementNS)
 import Web.DOM.Element (Element, removeAttribute, setAttribute)
 import Web.DOM.Element as E
 import Web.DOM.Node (Node, appendChild, childNodes, insertBefore, removeChild, replaceChild)
 import Web.DOM.NodeList (item)
 import Web.DOM.Text as T
-import Data.Array (union, length, (!!))
-import Data.Foldable (for_, foldMap)
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..), fst, lookup, curry)
-import Unsafe.Coerce (unsafeCoerce)
-import Foreign (Foreign, unsafeToForeign)
+import Web.Event.Event (target)
+import Web.Event.EventTarget (eventListener)
+import Web.Event.Internal.Types (Event)
+import Web.HTML (window)
+import Web.HTML.HTMLDocument (toDocument)
+import Web.HTML.HTMLInputElement (value)
+import Web.HTML.Window (document)
 
 
 

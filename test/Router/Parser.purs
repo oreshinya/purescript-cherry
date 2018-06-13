@@ -2,11 +2,11 @@ module Test.Router.Parser (assertRouteParser) where
 
 import Prelude
 
+import Cherry.Router.Parser (match, lit, int, param, end)
+import Control.Alt ((<|>))
+import Data.Maybe (fromMaybe)
 import Effect (Effect)
 import Test.Assert (assert)
-import Cherry.Router.Parser (match, lit, int, param, end)
-import Data.Maybe (fromMaybe)
-import Control.Alt ((<|>))
 
 data Route
   = Home

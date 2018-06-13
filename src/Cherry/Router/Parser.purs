@@ -13,18 +13,19 @@ module Cherry.Router.Parser
   ) where
 
 import Prelude
-import Data.Array as A
-import Data.Map as M
-import Data.String as S
+
 import Control.Alt (class Alt)
 import Control.MonadPlus (guard)
 import Control.Plus (class Plus)
+import Data.Array as A
 import Data.Foldable (foldr)
 import Data.Int (fromString)
-import Data.List (catMaybes, List(Nil, Cons), fromFoldable, drop)
-import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Data.List (catMaybes, List(..), fromFoldable, drop)
+import Data.Map as M
+import Data.Maybe (Maybe(..), maybe)
 import Data.Profunctor (lcmap)
-import Data.Tuple (Tuple(Tuple), fst, snd)
+import Data.String as S
+import Data.Tuple (Tuple(..), fst, snd)
 import Global (readFloat, isNaN)
 
 

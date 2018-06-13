@@ -8,7 +8,9 @@ module Cherry.Router
 
 import Prelude
 
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
+import Foreign (Foreign, unsafeToForeign)
 import Web.Event.Event (EventType)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.Event.Internal.Types (EventTarget)
@@ -17,8 +19,6 @@ import Web.HTML.Event.PopStateEvent.EventTypes (popstate)
 import Web.HTML.History (DocumentTitle(..), URL(..), back, forward, pushState, replaceState)
 import Web.HTML.Location (pathname, search)
 import Web.HTML.Window (Window, toEventTarget, history, location)
-import Foreign (Foreign, unsafeToForeign)
-import Data.Maybe (Maybe(..))
 
 
 

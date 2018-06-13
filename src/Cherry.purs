@@ -1,10 +1,11 @@
 module Cherry where
 
 import Prelude
-import Effect (Effect)
-import Cherry.Store (Store, subscribe)
+
 import Cherry.Renderer (Renderer, runRenderer)
+import Cherry.Store (Store, subscribe)
 import Data.Foldable (sequence_)
+import Effect (Effect)
 
 
 

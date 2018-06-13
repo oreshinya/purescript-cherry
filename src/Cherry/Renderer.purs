@@ -8,17 +8,17 @@ import Prelude
 
 import Cherry.Store (Store, select)
 import Cherry.VDOM (VNode, patch)
+import Data.List (List(..), (!!), (:), take)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
 import Effect.Ref (Ref, modify_, new, read, write)
+import Web.DOM.Element (toNode)
+import Web.DOM.Internal.Types (Node)
+import Web.DOM.ParentNode (QuerySelector(..), querySelector)
 import Web.HTML (window)
 import Web.HTML.HTMLDocument (toParentNode)
 import Web.HTML.Window (document, requestAnimationFrame)
-import Web.DOM.ParentNode (QuerySelector(..), querySelector)
-import Web.DOM.Internal.Types (Node)
-import Web.DOM.Element (toNode)
-import Data.List (List(..), (!!), (:), take)
-import Data.Maybe (Maybe(..))
 
 
 

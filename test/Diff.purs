@@ -3,18 +3,18 @@ module Test.Diff (assertDiffAlgorithm) where
 import Prelude
 
 import Cherry.VDOM (h, patch, t)
+import Data.Array (length, range, (!!))
+import Data.Foldable (for_)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
+import Test.Assert (assert)
+import Test.TestHelper (clearBody)
+import Web.DOM.Node (childNodes, firstChild, textContent)
+import Web.DOM.NodeList (item)
 import Web.HTML (window)
 import Web.HTML.HTMLDocument (body)
 import Web.HTML.HTMLElement (toNode)
 import Web.HTML.Window (document)
-import Web.DOM.Node (childNodes, firstChild, textContent)
-import Web.DOM.NodeList (item)
-import Data.Array (length, range, (!!))
-import Data.Foldable (for_)
-import Data.Maybe (Maybe(..))
-import Test.Assert (assert)
-import Test.TestHelper (clearBody)
 
 
 
