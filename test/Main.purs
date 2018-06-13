@@ -5,6 +5,7 @@ import Prelude
 import Effect (Effect)
 import Test.Diff (assertDiffAlgorithm)
 import Test.Router.Parser (testRouteParser)
+import Test.Style (testStyle)
 import Test.TestHelper (enableJSDOM)
 
 
@@ -14,3 +15,4 @@ main = do
   enableJSDOM
   assertDiffAlgorithm
   testRouteParser
+  testStyle
