@@ -24,16 +24,12 @@
     "output"
   ],
   "dependencies": {
-    "purescript-dom": "^4.10.0",
-    "purescript-console": "^3.0.0",
-    "purescript-vom": "^1.5.0",
-    "purescript-simple-emitter": "^0.1.2"
+    "purescript-web-html": "^1.0.0",
+    "purescript-profunctor": "^4.0.0",
+    "purescript-simple-emitter": "^1.0.0"
   },
   "devDependencies": {
-    "purescript-psci-support": "^3.0.0",
-    "purescript-rout": "^2.1.1",
-    "purescript-pure-style": "^2.0.1",
-    "purescript-tuples": "^4.1.0",
-    "purescript-aff": "^3.1.0"
+    "purescript-aff": "^5.0.0",
+    "purescript-assert": "^4.0.0"
   }
 }
