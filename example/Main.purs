@@ -134,7 +134,7 @@ increment = do
 changeMessage :: Event -> Effect Unit
 changeMessage ev = do
   content <- targetValue ev
-  reduce $ updateMsg content
+  reduce $ updateMsg $ fromMaybe "" content
   cnt <- select _.count
   reduce \s -> s { count = cnt + 1 }
   log "bar"

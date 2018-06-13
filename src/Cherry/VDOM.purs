@@ -135,8 +135,9 @@ setProp el (Tuple k v) =
     Attribute val -> do
       setForeign k (unsafeToForeign val) el
       setAttribute k val el
-    Handler val ->
-      setForeign k (unsafeToForeign $ eventListener val) el
+    Handler val -> do
+      listener <- eventListener val
+      setForeign k (unsafeToForeign listener) el
 
 
 
@@ -199,8 +200,11 @@ changed _ = true
 
 
 
-targetValue :: Event -> Effect String
-targetValue = target >>> unsafeCoerce >>> value
+targetValue :: Event -> Effect (Maybe String)
+targetValue ev =
+  case target ev of
+    Nothing -> pure Nothing
+    Just target' -> Just <$> (unsafeCoerce >>> value) target'
 
 
 
