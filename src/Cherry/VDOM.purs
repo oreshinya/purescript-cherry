@@ -26,9 +26,8 @@ import Web.DOM.Element as E
 import Web.DOM.Node (Node, appendChild, childNodes, insertBefore, removeChild, replaceChild)
 import Web.DOM.NodeList (item)
 import Web.DOM.Text as T
-import Web.Event.Event (target)
+import Web.Event.Event (Event, target)
 import Web.Event.EventTarget (eventListener)
-import Web.Event.Internal.Types (Event)
 import Web.HTML (window)
 import Web.HTML.HTMLDocument (toDocument)
 import Web.HTML.HTMLInputElement (value)
