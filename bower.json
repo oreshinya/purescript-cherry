@@ -26,7 +26,8 @@
   "dependencies": {
     "purescript-web-html": "^1.0.0",
     "purescript-profunctor": "^4.0.0",
-    "purescript-simple-emitter": "^1.0.0"
+    "purescript-simple-emitter": "^1.0.0",
+    "purescript-console": "^4.1.0"
   },
   "devDependencies": {
     "purescript-aff": "^5.0.0",
