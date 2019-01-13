@@ -4,6 +4,8 @@
 
 Simple PureScript application framework. see [example](https://github.com/oreshinya/purescript-cherry/blob/master/example/Main.purs).
 
+**WARNING** This repository is no longer maintenance to recreate more powerful virtual dom library.
+
 ## Installation
 
 ```
